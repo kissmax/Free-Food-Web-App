@@ -1,20 +1,54 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <div class= "jumbotron text-center">
-    <h1>Events Page</h1>
-    <p class = "lead">Here are events coming up that are offering free food</p>
+{% include 'includes/_navbar.html' %}
+
+<div class= "jumbotron text-center">
+  <h1>Events</h1>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <div class="container">
+   <div class="table-responsive">
+    <div id="events_table">
+    </div>
+   </div>
   </div>
-  <table style="width:100%">
-  <tr>
-    <th>Event</th>
-    <th>Date</th>
-    <th>Time</th>
-  </tr>
-  <tr>
-    <td>Improv Show</td>
-    <td>1/11/19</td>
-    <td>8:00PM</td>
-  </tr>
-</table>
+
+<script>
+  $(document).ready(function(){
+    $.ajax({
+      url:"static/Output6.csv",
+      dataType:"text",
+      success:function(data)
+    {
+      var event_data = data.split(/\r?\n|\r/);
+      var table_data = '<table class="table table-bordered table-striped">';
+      for(var count = 0; count<event_data.length; count++) {
+        var cell_data = event_data[count].split(',');
+        table_data += '<tr>';
+
+          for(var cell_count=0; cell_count<cell_data.length; cell_count++) {
+            name = cell_data[cell_count]
+            name = name.replace(/\+/g,',')
+            name = name.replace(/@/g,'')
+            cell_data[cell_count] = name
+            if (name.includes("http")){
+              table_data += '<td><a href ="'+name+'">link</a></td>'
+            } else if(count === 0) {
+              table_data += '<th>'+cell_data[cell_count]+'</th>';
+            } else {
+              table_data += '<td>'+cell_data[cell_count]+'</td>';
+            }
+          }
+        table_data += '</tr>';
+      }
+      table_data += '</table>';
+      $('#events_table').html(table_data);
+    }
+    });
+  });
+</script>
 {% endblock %}
